@@ -12,6 +12,8 @@ if(isset($_POST['uname'])) {
     $upass = $_POST['password'];
 
     $result = $user->login($uname, $upass);
+    
+    echo $result;
 }
 
 

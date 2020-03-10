@@ -1,6 +1,6 @@
 <?php
 //uncomment the line below if you have already added a new user
-//require_once 'auth.php';
+require_once 'auth.php';
 require_once 'User.php';
 
 if(isset($_POST['userid'])) {

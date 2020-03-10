@@ -115,7 +115,7 @@ class User {
                     $result = 1;
                 } else {
                     //if password is incorrect
-                    $result = 0;
+                    $result = $qry->error;
                 }
             } else {
                 //if username does not exist
@@ -126,6 +126,95 @@ class User {
             $result = 0;
         }
         return $result;
+    }
+    
+    function getUsers() {
+        $conn = $this->connect();
+        $sql = "SELECT tbl_user.userid, fname, mi, lname, n_ext, username, role FROM tbl_user, tbl_account WHERE tbl_user.userid=tbl_account.userid";
+        $result = $conn->query($sql);
+        return $result;
+    }
+    
+    function updateAccount($userid, $prev_uname, $new_uname, $role) {   
+        $conn = $this->connect();
+        
+        //Added to check if username exist or not
+        if($prev_uname!==$new_uname) {
+            $ucount = $this->checkUsername($uname);
+            //if $ucount is > 0 then username already exist, do not insert
+        } else {
+            $ucount=0;
+        }
+
+        if($ucount==0) {
+                //this will add new account in tbl_account
+            $sql = "UPDATE tbl_account SET username=?, role=? WHERE userid=?";
+            $qry = $conn->prepare($sql);
+            $qry->bind_param("sss", $new_uname, $role, $userid);
+            if($qry->execute()) {
+                $result = 1;
+            } else {
+                $result = 0;
+            }
+        } else {
+            $result = 0;
+        }
+        return $result;
+        
+    }
+    
+    function updatePassword($userid, $password) {   
+        $conn = $this->connect();
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        
+                //this will add new account in tbl_account
+        $sql = "UPDATE tbl_account SET password=? WHERE userid=?";
+        $qry = $conn->prepare($sql);
+        $qry->bind_param("ss", $password, $userid);
+        if($qry->execute()) {
+            $result = 1;
+        } else {
+            $result = 0;
+        }
+    
+        return $result;
+        
+    }
+    
+    function UpdateUser($userid, $fname, $mi, $lname, $n_ext) {
+        $conn = $this->connect();
+        //this will add new user in tbl_user
+        $sql = "UPDATE tbl_user SET fname=?, mi=?, lname=?, n_ext=? WHERE userid=?";
+        $qry = $conn->prepare($sql);
+        $qry->bind_param("sssss", $fname, $mi, $lname, $n_ext, $userid);
+        if($qry->execute()) {
+            $result = 1;
+        } else {
+            $result = 0;
+        }
+        return $result;
+    }
+    
+    function getUser($userid) {
+        $conn = $this->connect();
+        $sql = "SELECT tbl_user.userid, fname, mi, lname, n_ext, username, role FROM tbl_user, tbl_account WHERE tbl_user.userid=tbl_account.userid AND tbl_account.userid=?";
+        
+        $qry = $conn->prepare($sql);
+        $qry->bind_param("s", $userid);
+        
+        $qry->bind_result($userid, $fname, $mi, $lname, $n_ext, $username, $role);
+        $qry->execute();
+        $qry->fetch();
+        
+        $result['userid']=$userid;
+        $result['fname']=$fname;
+        $result['mi']=$mi;
+        $result['lname']=$lname;
+        $result['n_ext']=$n_ext;
+        $result['username']=$username;
+        $result['role']=$role;
+        
+        return $result; 
     }
     
     function clean($data) {
