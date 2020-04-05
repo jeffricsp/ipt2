@@ -24,7 +24,7 @@ $role = $_SESSION['role'];
                 Role: <?php echo $role; ?>
             <br><br>
             Note: You cannot open this page without a login account!<br><br>
-            <a href="adduser.php">Add New User</a> | <a href="login.php?logout=true">Logout</a>
+            <a href="adduser.php">Add New User</a> | <a href="showusers.php">Users</a> | <a href="login.php?logout=true">Logout</a>
         </div>
     </body>
 </html>

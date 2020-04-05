@@ -48,7 +48,7 @@ if(isset($_POST['userid'])) {
         
         $result = 1;
     }
-    //$fetch_result=getUserInfo($userid); 
+    $fetch_result=getUserInfo($userid); 
     
 }
 

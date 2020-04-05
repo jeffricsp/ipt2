@@ -131,8 +131,31 @@ class User {
     function getUsers() {
         $conn = $this->connect();
         $sql = "SELECT tbl_user.userid, fname, mi, lname, n_ext, username, role FROM tbl_user, tbl_account WHERE tbl_user.userid=tbl_account.userid";
+        
         $result = $conn->query($sql);
         return $result;
+    }
+    
+    function getUser($userid) {
+        $conn = $this->connect();
+        $sql = "SELECT tbl_user.userid, fname, mi, lname, n_ext, username, role FROM tbl_user, tbl_account WHERE tbl_user.userid=tbl_account.userid AND tbl_account.userid=?";
+        
+        $qry = $conn->prepare($sql);
+        $qry->bind_param("s", $userid);
+        
+        $qry->bind_result($userid, $fname, $mi, $lname, $n_ext, $username, $role);
+        $qry->execute();
+        $qry->fetch();
+        
+        $result['userid']=$userid;
+        $result['fname']=$fname;
+        $result['mi']=$mi;
+        $result['lname']=$lname;
+        $result['n_ext']=$n_ext;
+        $result['username']=$username;
+        $result['role']=$role;
+        
+        return $result; 
     }
     
     function updateAccount($userid, $prev_uname, $new_uname, $role) {   
@@ -140,14 +163,14 @@ class User {
         
         //Added to check if username exist or not
         if($prev_uname!==$new_uname) {
-            $ucount = $this->checkUsername($uname);
+            $ucount = $this->checkUsername($new_uname);
             //if $ucount is > 0 then username already exist, do not insert
         } else {
             $ucount=0;
         }
 
         if($ucount==0) {
-                //this will add new account in tbl_account
+            //this will add new account in tbl_account
             $sql = "UPDATE tbl_account SET username=?, role=? WHERE userid=?";
             $qry = $conn->prepare($sql);
             $qry->bind_param("sss", $new_uname, $role, $userid);
@@ -176,9 +199,7 @@ class User {
         } else {
             $result = 0;
         }
-    
         return $result;
-        
     }
     
     function UpdateUser($userid, $fname, $mi, $lname, $n_ext) {
@@ -195,27 +216,7 @@ class User {
         return $result;
     }
     
-    function getUser($userid) {
-        $conn = $this->connect();
-        $sql = "SELECT tbl_user.userid, fname, mi, lname, n_ext, username, role FROM tbl_user, tbl_account WHERE tbl_user.userid=tbl_account.userid AND tbl_account.userid=?";
-        
-        $qry = $conn->prepare($sql);
-        $qry->bind_param("s", $userid);
-        
-        $qry->bind_result($userid, $fname, $mi, $lname, $n_ext, $username, $role);
-        $qry->execute();
-        $qry->fetch();
-        
-        $result['userid']=$userid;
-        $result['fname']=$fname;
-        $result['mi']=$mi;
-        $result['lname']=$lname;
-        $result['n_ext']=$n_ext;
-        $result['username']=$username;
-        $result['role']=$role;
-        
-        return $result; 
-    }
+    
     
     function clean($data) {
         $conn = $this->connect();

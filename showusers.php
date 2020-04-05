@@ -13,6 +13,7 @@ $result = $user->getUsers();
     </head>
     <body>
         <h3>Registered Users</h3>
+        <a href="home.php">Home</a><br><br>
         <table border="1">
             <thead>
                 <tr>
